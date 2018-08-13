@@ -1,9 +1,13 @@
 package db;
 
 import models.Book;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
 
 public class DBBook {
     private static Session session;
@@ -22,5 +26,34 @@ public class DBBook {
         } finally {
             session.close();
         }
+    }
+    public static List<Book> getAll(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        List<Book> results = null;
+
+        try {
+            Criteria cr = session.createCriteria(Book.class);
+            results = cr.list();
+        } catch (HibernateException ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return results;
+    }
+    public static Book findById(int id){
+        Book result = null;
+        session = HibernateUtil.getSessionFactory().openSession();
+
+        try{
+            Criteria cr = session.createCriteria(Book.class);
+            cr.add(Restrictions.eq("id", id));
+            result = (Book) cr.uniqueResult();
+        } catch (HibernateException ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return result;
     }
 }
